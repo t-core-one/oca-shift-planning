@@ -60,6 +60,8 @@ class ShiftPlanning(models.Model):
         result = super().default_get(fields_list)
         last_plan = self._get_last_plan()
         if not last_plan or result.get("year") or result.get("week_number"):
+            if 'year' in result and 'week_number' in result:
+                result.update(year=fields.Date.today().year, week_number=fields.Date.today().isocalendar()[1])
             return result
         year, week_number, *_ = (
             last_plan.end_date + relativedelta(days=1)

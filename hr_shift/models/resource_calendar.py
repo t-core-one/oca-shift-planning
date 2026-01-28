@@ -30,15 +30,15 @@ class ResourceCalendar(models.Model):
         return shifts
 
     def _attendance_intervals_batch(
-        self, start_dt, end_dt, resources=None, domain=None, tz=None, lunch=False
+        self, start_dt, end_dt, resources=None, domain=None, tz=None
     ):
         # Override calendar intervals when a shift is found and substitute those
         # intervals with the ones on the shift
         # TODO: deal with TZ!
         res = super()._attendance_intervals_batch(
-            start_dt, end_dt, resources, domain, tz, lunch
+            start_dt, end_dt, resources, domain, tz
         )
-        if resources and not lunch:
+        if resources:
             shift_ids = self._resource_shift_for_datetime_range(
                 start_dt, end_dt, resources, tz=tz
             )

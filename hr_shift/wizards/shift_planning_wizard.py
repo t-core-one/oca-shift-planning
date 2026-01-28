@@ -22,7 +22,7 @@ class ShiftPlanningWizard(models.TransientModel):
     )
     from_planning_id = fields.Many2one(
         comodel_name="hr.shift.planning",
-        required=True,
+        required=False,
         compute="_compute_from_planning_id",
         store=True,
         readonly=False,
@@ -43,8 +43,8 @@ class ShiftPlanningWizard(models.TransientModel):
         result = super().default_get(fields_list)
         default_vals = self.env["hr.shift.planning"].default_get([])
         result.update(
-            week_number=default_vals["week_number"],
-            year=default_vals["year"],
+            week_number=default_vals.get("week_number", fields.Date.today().isocalendar()[1]),
+            year=default_vals.get("year", fields.Date.today().year),
         )
         if not result.get("from_planning_id"):
             result.update(
@@ -66,12 +66,21 @@ class ShiftPlanningWizard(models.TransientModel):
                 data[detail.day_number] = detail.template_id
             return data
 
-        planning = self.from_planning_id.copy(
-            {
-                "week_number": self.week_number,
-                "year": self.year,
-            }
-        )
+        if self.from_planning_id:
+            planning = self.from_planning_id.copy(
+                {
+                    "week_number": self.week_number,
+                    "year": self.year,
+                }
+            )
+        else:
+            planning = self.env["hr.shift.planning"].create(
+                {
+                    "week_number": self.week_number,
+                    "year": self.year,
+                }
+            )
+
         planning.generate_shifts()
         shift_templates_dict = {
             x.employee_id: {"template_id": x.template_id, "shift_lines": x.line_ids}

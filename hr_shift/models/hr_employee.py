@@ -8,15 +8,15 @@ class HrEmployeeBase(models.AbstractModel):
 
     shift_planning = fields.Boolean(
         help="Generate shifts for this employee in the shifts plannings",
-        group_expand="_group_expand_shift_planning",
+        # group_expand="_group_expand_shift_planning",
     )
     current_shift_id = fields.Many2one(
         comodel_name="hr.shift.planning.line", compute="_compute_current_shift_id"
     )
 
-    @api.model
-    def _group_expand_shift_planning(self, *args):
-        return [False, True]
+    # @api.model
+    # def _group_expand_shift_planning(self, *args):
+    #     return [False, True]
 
     def _shift_of_date(self, min_time, max_time):
         return (
