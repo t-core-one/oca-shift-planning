@@ -40,8 +40,6 @@ class ShiftPlanning(models.Model):
         default="new",
     )
     days_data = fields.Serialized(default={}, compute="_compute_days_data")
-    # Decidir cómo mostrar # nº asignados por turno, nº sin asignar
-    # summary = fields.Html()
 
     _sql_constraints = [
         (
@@ -336,10 +334,10 @@ class ShiftPlanningLine(models.Model):
     end_time = fields.Datetime(compute="_compute_shift_time", store=True)
     start_date = fields.Date(string="Date", compute="_compute_start_date")
     duration_hours = fields.Float(
-        string="Duration (Hours)", compute="_compute_duration", store=True
+        string="Hours", compute="_compute_duration", store=True
     )
     duration_days = fields.Float(
-        string="Duration (Days)", compute="_compute_duration", store=True
+        string="Days", compute="_compute_duration", store=True
     )
     state = fields.Selection(
         selection=[
@@ -401,8 +399,7 @@ class ShiftPlanningLine(models.Model):
             line.display_name = (
                 f"{_(dict(WEEK_DAYS_SELECTION).get(line.day_number))} - "
                 f"""
-                {line.template_id.name
-                or dict(
+                {line.template_id.name or dict(
                     self._fields['state']._description_selection(self.env)
                 )[line.state]}"""
             )
